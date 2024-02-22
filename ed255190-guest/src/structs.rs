@@ -27,19 +27,6 @@ pub fn add<const I: usize, const J: usize>(accm: &mut [u32; I], new: &[u32; J]) 
     carry
 }
 
-#[inline]
-pub fn overflow(accm: &mut [u32; 8]) {
-    let mut carry;
-    (carry, accm[0]) = add32_and_overflow(accm[0], 0x000003d1u32, 0);
-    (carry, accm[1]) = add32_and_overflow(accm[1], 0x1u32, carry);
-    (carry, accm[2]) = carry32_and_overflow(accm[2], carry);
-    (carry, accm[3]) = carry32_and_overflow(accm[3], carry);
-    (carry, accm[4]) = carry32_and_overflow(accm[4], carry);
-    (carry, accm[5]) = carry32_and_overflow(accm[5], carry);
-    (carry, accm[6]) = carry32_and_overflow(accm[6], carry);
-    (_, accm[7]) = carry32_and_overflow(accm[7], carry);
-}
-
 pub struct CompressedEdwardsY(pub [u32; 8]);
 
 #[derive(Clone)]
