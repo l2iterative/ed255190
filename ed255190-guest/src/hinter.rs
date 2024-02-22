@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DecompressionHint {
-    pub x: [u32; 8]
+    pub x: [u32; 8],
 }
 
 pub trait ComputeHintStreamer {
@@ -75,5 +75,5 @@ impl ComputeHintStreamer for ComputeHintBuffer {
 pub enum Hint {
     FormatError,
     VerificationFailed,
-    Ok
+    Ok,
 }
