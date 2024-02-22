@@ -1,0 +1,19 @@
+[package]
+name = "ed255190-host"
+version = "0.1.0"
+authors = ["Weikeng Chen <weikeng.chen@l2iterative.com>"]
+edition = "2021"
+
+[dependencies]
+ark-ed25519 = "0.4.0"
+ark-ec = "0.4.2"
+ark-ff = "0.4.2"
+num-bigint = "0.4.4"
+ed255190-guest = { path = "../ed255190-guest" }
+l2r0-small-serde = "0.20.1"
+serde = { version = "1.0.196", features = ["derive"] }
+anyhow = "1.0.79"
+bytemuck = "1.14.3"
+rand = "0.8.5"
+num-traits = "0.2.18"
+rand_chacha = "0.3.1"
