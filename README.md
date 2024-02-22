@@ -32,7 +32,6 @@ Table loading and unloading can trigger paging, which can be a dominating cost. 
 - reduce the size of the table by leveraging the negation of points
 - increase the segment maximal limit if we expect tables would be reused in one segment if the segment is larger
 
-
 ### Performance
 
 When one of the points is fixed, the other is not, it takes about 303260 cycles to compute `a * G + b * Q` where `G` is
@@ -44,6 +43,11 @@ done with 115286 cycles. Note that the first access loads two tables, one for `G
 
 We want to add that paging does significantly affect how we want to optimize, and it has a lot to do with whether `Q` is 
 being used very often to make it worthwhile to "cache" it by having pre-built tables.
+
+We do not have an accurate number for the current implementation that uses patched `ed25519-dalek` crate. But running [the benchmark 
+of EdDSA signature verification](https://github.com/risc0/risc0/blob/main/benchmarks/methods/guest/src/bin/ed25519_verify.rs) in RISC Zero, 
+which performs a full-fleged signature verification, it takes 615819 cycles. A microbenchmark suggests that SHA512 takes 217783 cycles. 
+We estimate that for ed25519, we do not have significant improvement over the existing implementation that uses `ed25519-dalek`. 
 
 ### Tendermint with cache
 
@@ -57,4 +61,4 @@ requires SHA512, and RISC Zero only has the SHA256 syscall that could be not use
 
 ### License
 
-The code is dual licensed under MIT or Apache2.0. 
+The code is dual licensed under MIT or Apache 2.0. 
