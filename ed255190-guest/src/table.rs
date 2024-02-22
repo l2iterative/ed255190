@@ -1,4 +1,4 @@
-pub static G_TABLES: [([u32; 8], [u32; 8]); 15] = [
+pub static G_TABLE: [([u32; 8], [u32; 8]); 15] = [
     (
         [
             2401621274u32,

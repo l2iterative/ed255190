@@ -11,12 +11,17 @@ mod structs;
 pub use structs::TEPoint;
 
 mod table;
-pub use table::G_TABLES;
+pub use table::G_TABLE;
+
+mod long_table;
+pub use long_table::{G2_LONG_TABLE, G_LONG_TABLE};
 
 mod evaluator;
 pub use evaluator::Evaluator;
 
+mod dual_table_evaluator;
 pub(crate) mod utils;
+pub use dual_table_evaluator::DualTableEvaluator;
 
 static MODULUS_Q: [u32; 8] = [
     0xffffffedu32,

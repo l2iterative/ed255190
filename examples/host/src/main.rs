@@ -11,6 +11,8 @@ use std::rc::Rc;
 
 use ed255190_host::{AffineEdwardsPoint, HintBuilder};
 use l2r0_profiler_host::CycleTracer;
+use rand::SeedableRng;
+use rand_chacha::ChaCha20Rng;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Task {
@@ -31,7 +33,7 @@ fn main() {
 
     let g2_ge = EdwardsAffine::rand(&mut prng);
 
-    let compute_hint = HintBuilder::build(
+    let compute_hint = HintBuilder::build_unknown_g2(
         &s1,
         &s2,
         &AffineEdwardsPoint {
@@ -42,6 +44,14 @@ fn main() {
 
     let mut compute_hint_vec = Vec::new();
     for entry in compute_hint {
+        for i in 0..8 {
+            compute_hint_vec.push(entry[i]);
+        }
+    }
+
+    let compute_hint_2 = HintBuilder::build_g2_in_table(&s1, &s2);
+
+    for entry in compute_hint_2 {
         for i in 0..8 {
             compute_hint_vec.push(entry[i]);
         }
@@ -59,6 +69,7 @@ fn main() {
     let cycle_tracer = Rc::new(RefCell::new(CycleTracer::default()));
 
     let env = ExecutorEnv::builder()
+        .segment_limit_po2(22)
         .write(&task_to_slice)
         .unwrap()
         .write(&((compute_hint_vec.len() * 4) as u32))
@@ -80,8 +91,16 @@ fn main() {
     cycle_tracer.borrow().print();
 
     let expected = (EdwardsAffine::generator().mul(&s1_fe) + g2_ge.mul(&s2_fe)).into_affine();
+    let g2 = {
+        let mut prng = ChaCha20Rng::seed_from_u64(0u64);
+        EdwardsAffine::rand(&mut prng)
+    };
+
+    let expected_2 = (EdwardsAffine::generator().mul(&s1_fe) + g2.mul(&s2_fe)).into_affine();
 
     let journal = session.journal.unwrap().bytes;
     assert_eq!(journal[0..32], expected.x.into_bigint().to_bytes_le());
     assert_eq!(journal[32..64], expected.y.into_bigint().to_bytes_le());
+    assert_eq!(journal[64..96], expected_2.x.into_bigint().to_bytes_le());
+    assert_eq!(journal[96..128], expected_2.y.into_bigint().to_bytes_le());
 }
