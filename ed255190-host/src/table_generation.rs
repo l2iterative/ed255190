@@ -3,6 +3,7 @@ use ark_ed25519::EdwardsAffine;
 use ark_ff::{BigInteger, PrimeField};
 use std::ops::Add;
 
+#[allow(unused)]
 pub struct TableGeneration {
     pub g_series: [([u32; 8], [u32; 8]); 15],
 }
@@ -65,7 +66,7 @@ mod test {
         // hint.print();
 
         for i in 0..15 {
-            let mut r_bigint = Fr::from((i + 1) as u8).into_bigint();
+            let r_bigint = Fr::from((i + 1) as u8).into_bigint();
 
             let r = Fr::from_le_bytes_mod_order(&r_bigint.to_bytes_le());
             let point_r = EdwardsAffine::generator().mul(&r).into_affine();

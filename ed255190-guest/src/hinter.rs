@@ -71,7 +71,7 @@ impl ComputeHintStreamer for ComputeHintBuffer {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Hint {
     FormatError,
     VerificationFailed,

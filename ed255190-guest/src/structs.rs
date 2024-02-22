@@ -42,6 +42,7 @@ pub fn overflow(accm: &mut [u32; 8]) {
 
 pub struct CompressedEdwardsY(pub [u32; 8]);
 
+#[derive(Clone)]
 pub struct TEPoint {
     pub x: [u32; 8],
     pub y: [u32; 8],
@@ -94,6 +95,15 @@ impl CompressedEdwardsY {
     }
 }
 
+impl Default for TEPoint {
+    fn default() -> Self {
+        Self {
+            x: [0u32; 8],
+            y: [1u32, 0u32, 0u32, 0u32, 0u32, 0u32, 0u32, 0u32],
+        }
+    }
+}
+
 impl TEPoint {
     pub fn check_add_hint(&self, rhs: &Self, hint: &Self) -> Result<(), EvaluationError> {
         let TEPoint { x: x1, y: y1 } = &self;
@@ -104,7 +114,7 @@ impl TEPoint {
         let y1y2 = mul_mod(y1, y2, &MODULUS_Q);
 
         let x1y2 = mul_mod(x1, y2, &MODULUS_Q);
-        let y1x2 = mul_mod(y1, x2, &MODULUS_Q);
+        let y1x2 = mul_mod(x2, y1, &MODULUS_Q);
 
         let mut dx1x2y1y2 = mul_mod(&x1x2, &y1y2, &MODULUS_Q);
         dx1x2y1y2 = mul_mod(&dx1x2y1y2, &COEFF_D, &MODULUS_Q);
@@ -115,7 +125,6 @@ impl TEPoint {
 
         let mut dx1x2y1y2_plus_one = dx1x2y1y2.clone();
         let _ = add::<8, 1>(&mut dx1x2y1y2_plus_one, &[1u32]);
-
         let x3_times_dx1x2y1y2_plus_one = mul_mod(&dx1x2y1y2_plus_one, &x3, &MODULUS_Q);
 
         // x3 * (1 + d * x1 * y1 * x2 * y2) = x1 * y2 + y1 * x2
@@ -131,18 +140,16 @@ impl TEPoint {
             return Err(EvaluationError::WrongHint);
         }
 
-        let mut y3_plus_x1x2 = y3.clone();
-        let _ = add::<8, 8>(&mut y3_plus_x1x2, &x1x2);
-        y3_plus_x1x2 = mul_mod(&y3_plus_x1x2, &ONE, &MODULUS_Q);
+        let mut should_be_y3 = mul_mod(&dx1x2y1y2, &y3, &MODULUS_Q);
+        let _ = add::<8, 8>(&mut should_be_y3, &y1y2);
+        should_be_y3 = mul_mod(&should_be_y3, &ONE, &MODULUS_Q);
+        let _ = add::<8, 8>(&mut should_be_y3, &x1x2);
+        should_be_y3 = mul_mod(&should_be_y3, &ONE, &MODULUS_Q);
 
-        let mut y1y2_plus_dx1x2y1y2y3 = mul_mod(&dx1x2y1y2, &y3, &MODULUS_Q);
-        let _ = add::<8, 8>(&mut y1y2_plus_dx1x2y1y2y3, &y1y2);
-        y1y2_plus_dx1x2y1y2y3 = mul_mod(&y1y2_plus_dx1x2y1y2y3, &ONE, &MODULUS_Q);
-
-        /// y3 + x1 * x2 = y1 * y2 + d * x1 * y1 * x2 * y2 * y3
+        // y3 =  x1 * x2 +  y1 * y2 + d * x1 * y1 * x2 * y2 * y3
         let mut second_equation_is_equal = true;
         for i in 0..8 {
-            if y1y2_plus_dx1x2y1y2y3[i] == y3_plus_x1x2[i] {
+            if should_be_y3[i] != y3[i] {
                 second_equation_is_equal = false;
                 break;
             }
@@ -186,18 +193,16 @@ impl TEPoint {
             return Err(EvaluationError::WrongHint);
         }
 
-        let mut y3_plus_x1x1 = y3.clone();
-        let _ = add::<8, 8>(&mut y3_plus_x1x1, &x1x1);
-        y3_plus_x1x1 = mul_mod(&y3_plus_x1x1, &ONE, &MODULUS_Q);
+        let mut should_be_y3 = mul_mod(&dx1x1y1y1, &y3, &MODULUS_Q);
+        let _ = add::<8, 8>(&mut should_be_y3, &y1y1);
+        should_be_y3 = mul_mod(&should_be_y3, &ONE, &MODULUS_Q);
+        let _ = add::<8, 8>(&mut should_be_y3, &x1x1);
+        should_be_y3 = mul_mod(&should_be_y3, &ONE, &MODULUS_Q);
 
-        let mut y1y1_plus_dx1x1y1y1y3 = mul_mod(&dx1x1y1y1, &y3, &MODULUS_Q);
-        let _ = add::<8, 8>(&mut y1y1_plus_dx1x1y1y1y3, &y1y1);
-        y1y1_plus_dx1x1y1y1y3 = mul_mod(&y1y1_plus_dx1x1y1y1y3, &ONE, &MODULUS_Q);
-
-        /// y3 + x1 * x1 = y1 * y1 + d * x1 * y1 * x1 * y1 * y3
+        // y3 = x1 * x1 + y1 * y1 + d * x1 * y1 * x1 * y1 * y3
         let mut second_equation_is_equal = true;
         for i in 0..8 {
-            if y1y1_plus_dx1x1y1y1y3[i] == y3_plus_x1x1[i] {
+            if should_be_y3[i] != y3[i] {
                 second_equation_is_equal = false;
                 break;
             }

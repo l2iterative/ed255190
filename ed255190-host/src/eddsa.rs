@@ -1,12 +1,23 @@
 use crate::COEFF_D;
 use ark_ed25519::Fq;
 use ark_ff::Field;
+use num_bigint::BigUint;
 use std::ops::Add;
 use std::str::FromStr;
 
+#[derive(Clone)]
 pub struct AffineEdwardsPoint {
     pub x: Fq,
     pub y: Fq,
+}
+
+impl Default for AffineEdwardsPoint {
+    fn default() -> Self {
+        Self {
+            x: Fq::ZERO,
+            y: Fq::ONE,
+        }
+    }
 }
 
 impl Add<&AffineEdwardsPoint> for &AffineEdwardsPoint {
@@ -24,13 +35,14 @@ impl Add<&AffineEdwardsPoint> for &AffineEdwardsPoint {
         let y1y2 = &self.y * &rhs.y;
 
         let x1y2 = &self.x * &rhs.y;
-        let x2y1 = &rhs.x * &self.y;
+        let y1x2 = &rhs.x * &self.y;
 
         let dx1x2y1y2 = coeff_d * &x1x2 * &y1y2;
-        let one_plus_dx1x2y1y2 = &Fq::ONE - &dx1x2y1y2;
-        let one_minus_dx1x2y1y2 = &Fq::ONE + &dx1x2y1y2;
 
-        let x1y2_plus_y1x2 = &x1y2 + &x2y1;
+        let one_plus_dx1x2y1y2 = &Fq::ONE + &dx1x2y1y2;
+        let one_minus_dx1x2y1y2 = &Fq::ONE - &dx1x2y1y2;
+
+        let x1y2_plus_y1x2 = &x1y2 + &y1x2;
         let x = x1y2_plus_y1x2 * one_plus_dx1x2y1y2.inverse().unwrap();
 
         let y1y2_plus_x1x2 = &y1y2 + &x1x2;

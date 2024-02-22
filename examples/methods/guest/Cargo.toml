@@ -1,0 +1,17 @@
+[package]
+name = "method"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[dependencies]
+risc0-zkvm = { version = "0.20.1", default-features = false, features = [ "std" ] }
+ed255190-guest = { path = "../../../ed255190-guest" }
+serde = { version = "1.0.196", features = ["derive"] }
+l2r0-small-serde = "0.20.1"
+l2r0-profiler-guest = "0.20.1"
+
+[features]
+default = []
+print-trace = ["l2r0-profiler-guest/print-trace", "ed255190-guest/print-trace"]

@@ -1,0 +1,17 @@
+[package]
+name = "host"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ark-ed25519 = "0.4.0"
+ark-ec = "0.4.2"
+ark-ff = "0.4.2"
+ed255190-host = { path = "../../ed255190-host" }
+methods = { path = "../methods" }
+rand = "0.8.5"
+risc0-zkvm = { version = "0.20.1", features = ["prove"] }
+serde = { version = "1.0.196", features = ["derive"] }
+l2r0-small-serde = "0.20.1"
+l2r0-profiler-host = { version = "0.20.1" }
+bytemuck = "1.14.3"

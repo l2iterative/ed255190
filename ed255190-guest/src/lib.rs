@@ -1,10 +1,22 @@
 mod error;
-mod hinter;
-mod structs;
-mod table;
-pub(crate) mod utils;
-
 pub use error::EvaluationError;
+
+mod hinter;
+pub use hinter::{ComputeHintStore, Hint};
+
+#[cfg(target_os = "zkvm")]
+pub use hinter::ComputeHintBuffer;
+
+mod structs;
+pub use structs::TEPoint;
+
+mod table;
+pub use table::G_TABLES;
+
+mod evaluator;
+pub use evaluator::Evaluator;
+
+pub(crate) mod utils;
 
 static MODULUS_Q: [u32; 8] = [
     0xffffffedu32,

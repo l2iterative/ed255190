@@ -3,6 +3,8 @@ resolver = "2"
 members = [
     "ed255190-host",
     "ed255190-guest",
+    "examples/host",
+    "examples/methods"
 ]
 
 # Always optimize; otherwise tests take excessively long.
