@@ -47,7 +47,8 @@ being used very often to make it worthwhile to "cache" it by having pre-built ta
 We do not have an accurate number for the current implementation that uses patched `ed25519-dalek` crate. But running [the benchmark 
 of EdDSA signature verification](https://github.com/risc0/risc0/blob/main/benchmarks/methods/guest/src/bin/ed25519_verify.rs) in RISC Zero, 
 which performs a full-fleged signature verification, it takes 615819 cycles. A microbenchmark suggests that SHA512 takes 217783 cycles. 
-We estimate that for ed25519, we do not have significant improvement over the existing implementation that uses `ed25519-dalek`. 
+We estimate that for ed25519 with a fixed point and a non-fixed point, we do not have significant improvement over the existing implementation 
+that uses `ed25519-dalek`. 
 
 ### Tendermint with cache
 
