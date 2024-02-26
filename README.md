@@ -34,19 +34,19 @@ Table loading and unloading can trigger paging, which can be a dominating cost. 
 
 ### Performance
 
-When one of the points is fixed, the other is not, it takes about 303260 cycles to compute `a * G + b * Q` where `G` is
+When one of the points is fixed, the other is not, it takes about 312287 cycles to compute `a * G + b * Q` where `G` is
 fixed and known, and `Q` does not have a precomputed table with it.
 
 When both points are fixed, the number of cycles have a lot to do with paging. The first access would basically load the 
-entire big table of `G` and `Q` in, which causes the first access to take 230156 cycles, while subsequent accesses can be 
-done with 115286 cycles. Note that the first access loads two tables, one for `G`, one for `Q`.
+entire big table of `G` and `Q` in, which causes the first access to take 229115 cycles, while subsequent accesses can be 
+done with 118621 cycles. Note that the first access loads two tables, one for `G`, one for `Q`.
 
 We want to add that paging does significantly affect how we want to optimize, and it has a lot to do with whether `Q` is 
 being used very often to make it worthwhile to "cache" it by having pre-built tables.
 
 We do not have an accurate number for the current implementation that uses patched `ed25519-dalek` crate. But running [the benchmark 
 of EdDSA signature verification](https://github.com/risc0/risc0/blob/main/benchmarks/methods/guest/src/bin/ed25519_verify.rs) in RISC Zero, 
-which performs a full-fleged signature verification, it takes 615819 cycles. A microbenchmark suggests that SHA512 takes 217783 cycles. 
+which performs a full-fledged signature verification, it takes 615819 cycles. A microbenchmark suggests that SHA512 takes 217783 cycles. 
 We estimate that for ed25519 with a fixed point and a non-fixed point, we do not have significant improvement over the existing implementation 
 that uses `ed25519-dalek`. 
 
